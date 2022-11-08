@@ -1,0 +1,9 @@
+[Unit]
+Description=Rotate test log files
+ConditionACPower=true
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/chmod 400 /test/logrotate.conf
+ExecStartPre=/usr/bin/chown root:root /test/logrotate.conf
+ExecStart=/usr/sbin/logrotate /test/logrotate.conf

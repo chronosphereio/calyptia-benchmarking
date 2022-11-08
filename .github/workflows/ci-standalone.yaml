@@ -1,0 +1,19 @@
+name: Standalone VM build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    # Only fire on changes to this component
+    paths:
+      - 'standalone/**'
+
+jobs:
+  publish-standalone-vm-comparison:
+    uses: ./.github/workflows/call-publish-vm-images.yaml
+    with:
+      template: standalone
+    secrets:
+      aws-access-key: ${{ secrets.AWS_MARKETPLACE_ACCESS_KEY }}
+      aws-secret-key: ${{ secrets.AWS_MARKETPLACE_SECRET_KEY }}
+      google_access_key: ${{ secrets.GCP_SA_KEY }}

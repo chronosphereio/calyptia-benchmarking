@@ -1,0 +1,37 @@
+# Set global options
+data_dir = "/tmp/vector"
+
+# Vector's API (disabled by default)
+# Enable and try it out with the `vector top` command
+[api]
+enabled = false
+# address = "127.0.0.1:8686"
+
+[sources.file]
+type = "file"
+include = ["/test/data/input.log"]
+read_from = "beginning"
+start_at_beginning = true
+max_line_bytes = 1024000
+
+[sinks.tcpsink]
+inputs = ["file"]
+type = "socket"
+address = "127.0.0.1:5170"
+mode = "tcp"
+
+[sinks.tcpsink.encoding]
+codec = "json"
+
+[sources.vector_metrics]
+type = "internal_metrics"
+# Specify this so we can query them, the metric name uses this as a prefix
+namespace = "vector_internal"
+
+[sinks.prometheus]
+type = "prometheus_remote_write"
+endpoint = "http://localhost:9090/api/v1/write"
+inputs = ["vector_metrics"]
+default_namespace = "vector_internal"
+# Mistakenly fails: https://github.com/vectordotdev/vector/issues/7998
+healthcheck = false

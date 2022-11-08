@@ -1,0 +1,53 @@
+version: "3"
+
+# Send all logs to the journal so we can retrieve later
+x-default-logging: &logging
+  driver: journald
+
+services:
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-admin-api'
+      - '--web.enable-lifecycle'
+      # Enable remote write, note this should be secured for any production instance
+      - '--web.enable-remote-write-receiver'
+    ports:
+      - 9090:9090
+    network_mode: host
+    logging: *logging
+
+  grafana:
+    image: grafana/grafana
+    user: "472"
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    network_mode: host
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./grafana/config.monitoring
+    logging: *logging
+
+  loki:
+    image: grafana/loki
+    network_mode: host
+    ports:
+        - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    logging: *logging
+
+volumes:
+  prometheus-data:
+  grafana-data:

@@ -1,0 +1,24 @@
+data_dir = "/tmp/vector"
+
+# Ingest
+[sources.file]
+type = "file"
+include = ["/test/data/input.log"]
+read_from = "beginning"
+
+[sinks.blackhole]
+inputs = ["file"]
+type = "blackhole"
+
+[sources.vector_metrics]
+type = "internal_metrics"
+# Specify this so we can query them, the metric name uses this as a prefix
+namespace = "vector_internal"
+
+[sinks.prometheus]
+type = "prometheus_remote_write"
+endpoint = "http://localhost:9090/api/v1/write"
+inputs = ["vector_metrics"]
+default_namespace = "vector_internal"
+# Mistakenly fails: https://github.com/vectordotdev/vector/issues/7998
+healthcheck = false
