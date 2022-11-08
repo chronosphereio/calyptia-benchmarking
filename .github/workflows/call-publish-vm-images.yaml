@@ -68,7 +68,7 @@ jobs:
         run: |
           GCP_IMAGE_NAME=$(jq -cr '.builds[]|select(.builder_type=="googlecompute") |.artifact_id' manifest.json)
           echo $GCP_IMAGE_NAME
-          echo "gcp_image$GCP_IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "gcp_image=$GCP_IMAGE_NAME" >> $GITHUB_OUTPUT
         shell: bash
         working-directory: ${{ inputs.template }}
 
