@@ -1,0 +1,5 @@
+# https://github.com/ncabatoff/process-exporter
+process_names:
+  - name: "{{.Comm}}"
+    cmdline:
+    - '.+'

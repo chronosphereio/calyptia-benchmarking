@@ -1,0 +1,8 @@
+# pipeline:
+#   batch:
+#     size: ${BATCH_SIZE}
+#     delay: ${BATCH_DELAY:50}
+# node:
+#   name: "node_${HOSTNAME:comparison}"
+# path:
+#    queue: "/tmp/${QUEUE_DIR:queue}"

@@ -1,0 +1,12 @@
+[Unit]
+Description=Fast rotation of test input data
+
+[Timer]
+# Run every minute
+OnCalendar=*:0/1
+AccuracySec=1s
+Persistent=true
+# Unit=logrotate-test.service
+
+[Install]
+WantedBy=timers.target

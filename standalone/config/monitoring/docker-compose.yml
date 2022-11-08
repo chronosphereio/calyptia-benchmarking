@@ -1,0 +1,107 @@
+version: "3"
+
+# Send all logs to the journal so we can retrieve later
+x-default-logging: &logging
+  driver: journald
+
+services:
+
+  fluent-bit:
+    image: fluent/fluent-bit
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf:ro
+      # The following are for node exporter metrics
+      - /proc:/host/proc
+      - /sys:/host/sys
+    logging: *logging
+
+  https-benchmark-server:
+    image: ghcr.io/calyptia/https-benchmark-server:master
+    command: ./https-benchmark-server -printrecords=false
+    ports:
+      - "8443:8443"
+    logging: *logging
+
+  # We use Fluent Bit to receive TCP input in JSON format and then can scrape that info
+  tcp-benchmark-server:
+    image: fluent/fluent-bit
+    ports:
+      - "5170:5170"
+    volumes:
+      - ./tcp-server.conf:/fluent-bit/etc/fluent-bit.conf:ro
+    logging: *logging
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-admin-api'
+      - '--web.enable-lifecycle'
+      # Enable remote write, note this should be secured for any production instance
+      - '--web.enable-remote-write-receiver'
+    ports:
+      - 9090:9090
+    links:
+      - cadvisor:cadvisor
+      - process-exporter:process-exporter
+    depends_on:
+      - cadvisor
+      - process-exporter
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    logging: *logging
+
+  process-exporter:
+    image: ncabatoff/process-exporter
+    command:
+      - '-procfs=/host/proc'
+      - '-config.path=/process-exporter.yml'
+    volumes:
+      - /proc:/host/proc:ro
+      - ./process-exporter.yml:/process-exporter.yml:ro
+    privileged: true
+    ports:
+      - 9256:9256
+    logging: *logging
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    logging: *logging
+
+  grafana:
+    image: grafana/grafana
+    user: "472"
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./grafana/config.monitoring
+    logging: *logging
+
+  loki:
+    image: grafana/loki
+    ports:
+        - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    logging: *logging
+
+volumes:
+  prometheus-data:
+  grafana-data:

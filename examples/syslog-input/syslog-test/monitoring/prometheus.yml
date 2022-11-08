@@ -1,0 +1,40 @@
+global:
+  # scrape_interval:     15s # By default, scrape targets every 15 seconds.
+  # scrape_timeout is set to the global default (10s).
+  external_labels:
+      monitor: 'vendor-test'
+
+scrape_configs:
+  - job_name: 'monitoring-prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'monitoring-cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'host-fluent-bit'
+    metrics_path: /api/v1/metrics/prometheus
+    static_configs:
+      - targets: ['host.docker.internal:2020']
+
+  - job_name: 'process_exporter'
+    static_configs:
+      - targets: ['process-exporter:9256']
+    metric_relabel_configs:
+      - source_labels: ["groupname"]  # the label which needs to be filtered
+        regex: "(.*);(.*)"            # the regex to find the expected match
+        target_label: "processname"   # add a new label
+        replacement: "$1"             # substitute with the 1st match
+      - source_labels: ["groupname"]  # the label which needs to be filtered
+        regex: "(.*);(.*)"            # the regex to find the expected match
+        target_label: "username"      # add a new label
+        replacement: "$2"             # substitute with the 2nd match
+
+  - job_name: 'https-benchmark-server'
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets:
+        - 'https-benchmark-server:8443'

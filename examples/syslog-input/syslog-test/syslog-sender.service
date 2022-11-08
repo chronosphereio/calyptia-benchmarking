@@ -1,0 +1,15 @@
+[Unit]
+Description=Syslog sender example service
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Restart=always
+RestartSec=10
+
+ExecStart=/bin/bash /opt/syslog-sender/run.sh
+# Realtime priority
+CPUSchedulingPolicy=rr
+# 1 lowest -> 99 highest
+CPUSchedulingPriority=95

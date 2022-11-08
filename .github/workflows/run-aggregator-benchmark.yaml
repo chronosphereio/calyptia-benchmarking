@@ -1,0 +1,99 @@
+name: Run Aggregator benchmark scenario
+on:
+  workflow_dispatch:
+    inputs:
+      test_scenario:
+        description: The test scenario we want to run under aggregator/test/scenarios.
+        type: string
+        default: tcp_input
+        required: true
+      input_machine_type:
+        description: The machine type to use for each instance VM sending data to the aggregator.
+        type: string
+        default: e2-highcpu-8
+        required: true
+      input_machine_count:
+        description: The number of VMs sending data to the aggregator.
+        type: string
+        default: '3'
+        required: true
+      input_machine_log_rate:
+        description: The number of log messages per second generated on the input VMs.
+        type: string
+        default: '20000'
+        required: true
+      input_machine_log_size:
+        description: The size in bytes of each log message generated on the input VMs.
+        type: string
+        default: '1000'
+        required: true
+      aggregator_machine_type:
+        description: The machine type to use for the aggregator.
+        type: string
+        default: e2-highcpu-16
+        required: true
+      gcp_project:
+        description: The GCP project to run benchmarking in, i.e. where to create the VMs.
+        type: string
+        default: calyptia-benchmark
+        required: true
+      gcp_zone:
+        description: The GCP zone to run benchmarking in, i.e. where to create the VMs.
+        type: string
+        default: us-central1-a
+        required: true
+      grafana_prometheus_url:
+        description: The Grafana Cloud (or Prometheus remote write) endpoint for metrics.
+        type: string
+        default: prometheus-prod-10-prod-us-central-0.grafana.net
+        required: true
+      grafana_loki_url:
+        description: The Grafana Cloud (or Loki) endpoint for logs.
+        type: string
+        default: logs-prod3.grafana.net
+        required: true
+
+jobs:
+  run-gcp:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up GCP authentication
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: ${{ secrets.GCP_BENCHMARKING_KEY }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v0'
+
+      - name: Ensure defaults set up
+        run: |
+          gcloud config set compute/zone ${{ inputs.gcp_zone }}
+          gcloud config set project ${{ inputs.gcp_project }}
+        shell: bash
+
+      - name: Run benchmark setup script with parameters
+        run: |
+          ./aggregator/run-gcp-test.sh
+        shell: bash
+        env:
+          TEST_SCENARIO: ${{ inputs.test_scenario }}
+          INPUT_MACHINE_TYPE: ${{ inputs.input_machine_type }}
+          INPUT_VM_COUNT: ${{ inputs.input_machine_count }}
+          INPUT_LOG_RATE: ${{ inputs.input_machine_log_rate }}
+          INPUT_LOG_SIZE: ${{ inputs.input_machine_log_size }}
+
+          CORE_MACHINE_TYPE: ${{ inputs.aggregator_machine_type }}
+          GRAFANA_CLOUD_PROM_URL: ${{ inputs.grafana_prometheus_url }}
+          GRAFANA_CLOUD_LOKI_URL: ${{ inputs.grafana_loki_url }}
+
+          CALYPTIA_CLOUD_PROJECT_TOKEN: ${{ secrets.CALYPTIA_CLOUD_PROJECT_TOKEN }}
+          GRAFANA_CLOUD_PROM_USERNAME: ${{ secrets.GRAFANA_CLOUD_PROM_USERNAME }}
+          GRAFANA_CLOUD_LOKI_USERNAME: ${{ secrets.GRAFANA_CLOUD_LOKI_USERNAME }}
+          GRAFANA_CLOUD_APIKEY: ${{ secrets.GRAFANA_CLOUD_APIKEY }}
+          GRAFANA_ANNOTATION_APIKEY: ${{ secrets.GRAFANA_CALYPTIA_BENCHMARKS_API_KEY }}

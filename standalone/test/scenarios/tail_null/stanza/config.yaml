@@ -1,0 +1,9 @@
+pipeline:
+  # input
+  - type: file_input
+    include:
+      - /test/data/input.log
+    start_at: beginning
+
+  # just drop
+  - type: drop_output

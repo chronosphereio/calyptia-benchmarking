@@ -1,0 +1,6 @@
+manifest.json
+output/
+benchmark-output.conf
+coreconfig
+.env
+gha-creds-*.json
