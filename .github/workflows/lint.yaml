@@ -33,7 +33,7 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v3
-      - uses: actionshub/markdownlint@2.0.2
+      - uses: actionshub/markdownlint@V2.1.1
 
   packerlint:
     runs-on: ubuntu-latest
