@@ -36,7 +36,7 @@ jobs:
       with:
         images: ghcr.io/${{ github.repository }}/data-generator
 
-    - uses: docker/build-push-action@v3
+    - uses: docker/build-push-action@v4
       with:
         context: "{{defaultContext}}:data-generator"
         tags: ${{ steps.meta.outputs.tags }}
