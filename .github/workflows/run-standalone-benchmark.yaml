@@ -12,6 +12,11 @@ on:
         type: string
         default: "1000"
         required: true
+      input_machine_log_rate:
+        description: The rate in logs per second to generate on the input VMs.
+        type: string
+        default: "20000"
+        required: true
       gcp_project:
         description: The GCP project to run benchmarking in, i.e. where to create the VMs.
         type: string
@@ -64,6 +69,7 @@ jobs:
         env:
           MACHINE_TYPE: ${{ inputs.input_machine_type }}
           INPUT_LOG_SIZE: ${{ inputs.input_machine_log_size }}
+          INPUT_LOG_RATE: ${{ inputs.input_machine_log_rate }}
           GCP_PROJECT: ${{ inputs.gcp_project }}
           GRAFANA_CLOUD_PROM_URL: ${{ inputs.grafana_prometheus_url }}
           GRAFANA_CLOUD_LOKI_URL: ${{ inputs.grafana_loki_url }}
