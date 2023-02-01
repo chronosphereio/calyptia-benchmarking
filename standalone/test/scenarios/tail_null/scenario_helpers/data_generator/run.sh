@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-INPUT_LOG_RATE=${INPUT_LOG_RATE:-200000}
+INPUT_LOG_RATE=${INPUT_LOG_RATE:-20000}
 INPUT_LOG_SIZE=${INPUT_LOG_SIZE:-1000}
 echo "Starting data generation: $INPUT_LOG_SIZE @ $INPUT_LOG_RATE"
 
