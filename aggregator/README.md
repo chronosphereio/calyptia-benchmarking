@@ -94,4 +94,5 @@ export CALYPTIA_CLOUD_AGGREGATOR_NAME=benchmark-forward
 ## Known issues
 
 - Script is stuck in `Waiting for SSH access to`
+
 > Ensure that the default project and the default zone are set correctly.
