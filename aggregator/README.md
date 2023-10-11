@@ -53,3 +53,46 @@ GRAFANA_CLOUD_APIKEY='XXXX'
 ```
 
 Similarly a cloud-init approach can be used to set this up as part of VM creation.
+
+## Running a test
+
+### Required settings
+
+- Config a default project with appropriate permissions
+
+```shell
+gcloud config set project calyptia-benchmark
+```
+
+- Config a default zone
+
+```shell
+gcloud config set compute/zone us-central1-a
+```
+
+- Set the Calyptia Cloud project token
+
+```shell
+export CALYPTIA_CLOUD_PROJECT_TOKEN=XXXX
+```
+
+### Recommended settings
+
+```shell
+export INPUT_VM_NAME_PREFIX=benchmark-instance-input-fwd
+export CORE_VM_NAME=benchmark-instance-core-fwd
+export TEST_SCENARIO=forward_input
+export CALYPTIA_CLOUD_AGGREGATOR_NAME=benchmark-forward
+```
+
+### Run the test
+
+```shell
+./run-gcp-test.sh
+```
+
+## Known issues
+
+- Script is stuck in `Waiting for SSH access to`
+
+> Ensure that the default project and the default zone are set correctly.
