@@ -58,17 +58,20 @@ Similarly a cloud-init approach can be used to set this up as part of VM creatio
 
 ### Required settings
 
-* Config a default project with appropriate permisions
+- Config a default project with appropriate permissions
+
 ```shell
 gcloud config set project calyptia-benchmark
 ```
 
-* Config a default zone
+- Config a default zone
+
 ```shell
 gcloud config set compute/zone us-central1-a
 ```
 
-* Set the Calyptia Cloud project token
+- Set the Calyptia Cloud project token
+
 ```shell
 export CALYPTIA_CLOUD_PROJECT_TOKEN=XXXX
 ```
@@ -88,8 +91,7 @@ export CALYPTIA_CLOUD_AGGREGATOR_NAME=benchmark-forward
 ./run-gcp-test.sh
 ```
 
-
 ## Known issues
 
-* Script is stuck in `Waiting for SSH access to`
+- Script is stuck in `Waiting for SSH access to`
 > Ensure that the default project and the default zone are set correctly.
