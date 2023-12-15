@@ -79,7 +79,7 @@ jobs:
           GRAFANA_ANNOTATION_APIKEY: ${{ secrets.GRAFANA_CALYPTIA_BENCHMARKS_API_KEY }}
 
       - name: Upload results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Results
           path: ./examples/standalone-benchmarking/output/
