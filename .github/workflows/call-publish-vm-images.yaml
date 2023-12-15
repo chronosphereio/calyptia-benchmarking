@@ -58,7 +58,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.aws-secret-key }}
 
       - name: Upload manifest file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ${{ inputs.template }}/manifest.json
           name: manifest
